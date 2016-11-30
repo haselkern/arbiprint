@@ -1,0 +1,195 @@
+package com.haselkern.java.arbiprint;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javafx.application.Platform;
+
+public class Prefs {
+	
+	private static final String KEY_PRINT_CMD = "command";
+	private static final String KEY_USER = "user";
+	private static final String KEY_PRINTER = "printers";
+	private static final String DEFAULT_PRINT_CMD = "a2ps -1 -P %PRINTER% %FILE% 2>> arbiprint/log.txt";
+	private static final String DEFAULT_USER = "";
+	private static final String DEFAULT_PRINTER = "";
+	private static final String KEY_HOST = "host";
+	private static final String DEFAULT_HOST = "chiemsee.informatik.uni-oldenburg.de";
+	
+	
+	// Single instance of properties we are working on
+	private static Properties props;
+	
+	private static boolean isWatching = true;
+	
+	// Do not allow instancing
+	private Prefs() { }
+	
+	public static String getPrintCommand(){
+		check();
+		return props.getProperty(KEY_PRINT_CMD);
+	}
+	
+	public static String getUser(){
+		check();
+		return props.getProperty(KEY_USER);
+	}
+	
+	public static String getHost(){
+		check();
+		return props.getProperty(KEY_HOST);
+	}
+	
+	// Read printers
+	public static List<String> getPrinters(){
+		check();
+		// List is comma seperated
+		ArrayList<String> result = new ArrayList<String>();
+		for(String p : props.getProperty(KEY_PRINTER).split(",")){
+			// Only add printer if string is not empty
+			result.add(p);
+		}
+		return result;
+	}
+	
+	public static void setUser(String user){
+		check();
+		props.setProperty(KEY_USER, user);
+		writeProps();
+	}
+	
+	public static void addPrinter(String printername){
+		List<String> p = getPrinters();
+		
+		// Printer is already in the list, abort
+		if(printername == null || p.contains(printername) || printername.length() == 0) return;
+		
+		p.add(printername);
+		
+		p.sort((a, b) -> a.compareTo(b));
+		
+		String s = String.join(",", p);
+		
+		props.setProperty(KEY_PRINTER, s.toString());
+		writeProps();
+	}
+	
+	// Check if properties are loaded and complete
+	private static void check(){
+		
+		// Read props if they don't exist in memory
+		if(props == null){
+			props = readProps();
+			listenForFileChanges();
+		}
+		
+		
+		// Make sure all keys are set
+		if(!props.containsKey(KEY_PRINT_CMD)){
+			props.put(KEY_PRINT_CMD, DEFAULT_PRINT_CMD);
+		}
+		if(!props.containsKey(KEY_USER)){
+			props.put(KEY_USER, DEFAULT_USER);
+		}
+		if(!props.containsKey(KEY_PRINTER)){
+			props.put(KEY_PRINTER, DEFAULT_PRINTER);
+		}
+		if(!props.containsKey(KEY_HOST)){
+			props.put(KEY_HOST, DEFAULT_HOST);
+		}
+
+		writeProps();
+		
+	}
+	
+	// Listen for file changes and reload properties
+	private static void listenForFileChanges(){
+		// Since I can't get the watchservice to work this will reload the config file every 300ms
+		
+		new Thread(() -> {
+			while(isWatching){
+				try{
+					Thread.sleep(300);
+				} catch(Exception e){}
+				Platform.runLater(() -> {
+					props = readProps();
+				});
+			}
+		}).start();
+		
+	}
+	
+	public static void stopWatching(){
+		isWatching = false;
+	}
+	
+	public static String getFile(){
+		return getFolder() + "arbiprint-config.txt";
+	}
+	
+	private static String getFolder(){
+		return System.getProperty("user.home") + "/.haselkern/";
+	}
+	
+	// Read properties from file
+	private static Properties readProps(){
+		Properties props = new Properties();
+		
+		try {
+			
+			BufferedReader reader = Files.newBufferedReader(new File(getFile()).toPath());
+			String line;
+			while((line = reader.readLine()) != null){
+				
+				if(line.contains("=")){
+					String[] keyValue = line.split("=");
+					String value = keyValue.length > 1 ? keyValue[1] : "";
+					props.put(keyValue[0], value);
+				}
+				
+			}
+			
+		} catch (IOException e) {
+			// No file access
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return props;
+	}
+	
+	// Write properties to file
+	private static void writeProps(){
+
+		try {
+			
+			// Create directories
+			File folder = new File(getFolder());
+			folder.mkdirs();
+
+			// Write file
+			StringBuilder out = new StringBuilder();
+			for(Object key : props.keySet()){
+				String k = (String)key;
+				out.append(k);
+				out.append("=");
+				out.append(props.getProperty(k));
+				out.append("\n");
+			}
+			
+			FileOutputStream fos = new FileOutputStream(new File(getFile()), false);
+			fos.write(out.toString().getBytes());
+			fos.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+}
