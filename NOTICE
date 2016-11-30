@@ -1,0 +1,7 @@
+This program uses icons from the google material design icons project,
+released under the Apache 2.0 license.
+https://google.github.io/material-design-icons/
+
+This program also uses the Jsch 'Java Secure Channel' library released
+unter a BSD-style license.
+http://www.jcraft.com/jsch/LICENSE.txt
