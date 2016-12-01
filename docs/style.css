@@ -5,14 +5,7 @@
     font-weight: 400;
 }
 
-#wrap{
-    max-width: 500px;
-    margin: 0 auto;
-    border: 1px solid black;
-}
-
 h1, h2{
-    margin: 0;
     font-family: 'Roboto', sans-serif;
     font-weight: 300;
     text-align: center;
@@ -53,7 +46,6 @@ h2{
     width: 300px;
     text-decoration: none;
     color: #fff;
-    transition: 200ms;
 }
 .pane span{
     display: block;
