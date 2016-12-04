@@ -6,14 +6,24 @@ import javafx.scene.control.Alert.AlertType;
 public class Dialog {
 
 	public static void missingCredentials(){
-		
+		showError("Missing credentials", "Please enter username, password and printername.");
+	}
+	
+	public static void loginFailed(){
+		showError("Login failed", "Wrong password or username.");
+	}
+	
+	public static void hostUnreachable(){
+		showError("Host unreachable", "Check your internet connection or enter a different host in settings.");
+	}
+	
+	private static void showError(String title, String msg){
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");
-		alert.setHeaderText("Missing credentials");
-		alert.setContentText("Please enter username, password and printername.");
+		alert.setHeaderText(title);
+		alert.setContentText(msg);
 
 		alert.showAndWait();
-		
 	}
 	
 	public static void desktopMissing(){
