@@ -31,6 +31,7 @@ public class Main extends Application {
 
 	private ObservableList<File> files;
 	private Button printButton;
+	private Label dragDropLabel;
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -39,7 +40,7 @@ public class Main extends Application {
 		// Setup drag And Drop pane with image
 		Image image = new Image("resources/ic_copy.png");
 		ImageView imageView = new ImageView(image);
-		Label dragDropLabel = new Label("Drop files here to print them", imageView);
+		dragDropLabel = new Label("Drop files here to print them", imageView);
 		dragDropLabel.setContentDisplay(ContentDisplay.TOP);
 		// Create drag and drop list
 		ListView<File> list = new ListView<File>();
@@ -168,6 +169,9 @@ public class Main extends Application {
 	
 	public void removeFileFromList(File f){
 		files.remove(f);
+		if(files.isEmpty()){
+			dragDropLabel.setVisible(true);
+		}
 	}
 	
 	public static void main(String[] args) {
