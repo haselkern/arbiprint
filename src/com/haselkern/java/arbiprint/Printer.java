@@ -18,9 +18,9 @@ public class Printer implements Runnable {
 	private File[] files;
 	private Main callback;
 	private String username, password;
-	private String printername, command;
+	private String printername;
 	
-	public Printer(List<File> filelist, String username, String password, String printername, String command, Main callback){
+	public Printer(List<File> filelist, String username, String password, String printername, Main callback){
 		files = new File[filelist.size()];
 		files = filelist.toArray(files);
 		
@@ -28,11 +28,14 @@ public class Printer implements Runnable {
 		this.username = username;
 		this.password = password;
 		this.printername = printername;
-		this.command = command;
 	}
 	
 	@Override
 	public void run() {
+		
+		System.out.println("Printing " + files.length + " files as user " + username + " on printer " + printername);
+		System.out.println("Host: " + Prefs.getHost());
+		System.out.println("Command: " + Prefs.getPrintCommand());
 		
 		Platform.runLater(() -> {
 			callback.setEnablePrintButton(false);
@@ -70,7 +73,7 @@ public class Printer implements Runnable {
 				
 				// Run print command
 				ChannelExec execChannel = (ChannelExec) session.openChannel("exec");
-				execChannel.setCommand(command.replaceAll("%FILE%", filePath).replaceAll("%PRINTER%", printername));
+				execChannel.setCommand(Prefs.getPrintCommand().replaceAll("%FILE%", filePath).replaceAll("%PRINTER%", printername));
 				execChannel.connect();
 				execChannel.disconnect();
 				

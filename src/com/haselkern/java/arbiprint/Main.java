@@ -1,9 +1,6 @@
 package com.haselkern.java.arbiprint;
 
-import java.awt.Desktop;
-import java.awt.Desktop.Action;
 import java.io.File;
-import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -25,6 +22,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -91,30 +89,20 @@ public class Main extends Application {
 		// Print button and settings button
 		printButton = new Button("print");
 		printButton.setPrefWidth(300);
-		Button settingsButton = new Button("settings");
+		Button settingsButton = new Button("preferences");
 		settingsButton.setPrefWidth(100);
 		
 		HBox buttons = new HBox(printButton, settingsButton);
 		buttons.setSpacing(5);
 
-		// Launch txt program to edit preferences with
+		// Open preference window
 		settingsButton.setOnAction(event -> {
-			if(Desktop.isDesktopSupported()){
-				Desktop desktop = Desktop.getDesktop();
-				if(desktop.isSupported(Action.OPEN)){
-					try {
-						desktop.open(new File(Prefs.getFile()));
-					} catch (IOException e) {
-						Dialog.desktopMissing();
-					}
-				}
-				else{
-					Dialog.desktopMissing();
-				}
-			}
-			else{
-				Dialog.desktopMissing();
-			}
+			
+			PrefWindow prefWindow = new PrefWindow();
+			prefWindow.initOwner(primaryStage);
+			prefWindow.initModality(Modality.WINDOW_MODAL);
+			prefWindow.show();
+			
 		});
 		
 		printButton.setOnAction(event -> {
@@ -129,7 +117,6 @@ public class Main extends Application {
 						username.getText(),
 						password.getText(),
 						printername.getValue(),
-						Prefs.getPrintCommand(),
 						this
 					);
 				new Thread(printer).start();
@@ -141,11 +128,6 @@ public class Main extends Application {
 				printers.setAll(Prefs.getPrinters());
 			}
 			
-		});
-		
-		// Kill preference watcher on application exit
-		primaryStage.setOnCloseRequest(event -> {
-			Prefs.stopWatching();
 		});
 
 		// Create layout

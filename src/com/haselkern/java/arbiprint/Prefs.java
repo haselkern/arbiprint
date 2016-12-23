@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javafx.application.Platform;
-
 public class Prefs {
 	
 	private static final String KEY_PRINT_CMD = "command";
@@ -25,8 +23,6 @@ public class Prefs {
 	
 	// Single instance of properties we are working on
 	private static Properties props;
-	
-	private static boolean isWatching = true;
 	
 	// Do not allow instancing
 	private Prefs() { }
@@ -64,6 +60,18 @@ public class Prefs {
 		writeProps();
 	}
 	
+	public static void setPrintCommand(String command){
+		check();
+		props.setProperty(KEY_PRINT_CMD, command);
+		writeProps();
+	}
+	
+	public static void setHost(String host){
+		check();
+		props.setProperty(KEY_HOST, host);
+		writeProps();
+	}
+	
 	public static void addPrinter(String printername){
 		List<String> p = getPrinters();
 		
@@ -80,13 +88,23 @@ public class Prefs {
 		writeProps();
 	}
 	
+
+	// Restore default settings
+	public static void revert(){
+		check();
+		props.setProperty(KEY_HOST, DEFAULT_HOST);
+		props.setProperty(KEY_PRINTER, DEFAULT_PRINTER);
+		props.setProperty(KEY_PRINT_CMD, DEFAULT_PRINT_CMD);
+		props.setProperty(KEY_USER, DEFAULT_USER);
+		writeProps();
+	}
+	
 	// Check if properties are loaded and complete
 	private static void check(){
 		
 		// Read props if they don't exist in memory
 		if(props == null){
 			props = readProps();
-			listenForFileChanges();
 		}
 		
 		
@@ -106,27 +124,6 @@ public class Prefs {
 
 		writeProps();
 		
-	}
-	
-	// Listen for file changes and reload properties
-	private static void listenForFileChanges(){
-		// Since I can't get the watchservice to work this will reload the config file every 300ms
-		
-		new Thread(() -> {
-			while(isWatching){
-				try{
-					Thread.sleep(300);
-				} catch(Exception e){}
-				Platform.runLater(() -> {
-					props = readProps();
-				});
-			}
-		}).start();
-		
-	}
-	
-	public static void stopWatching(){
-		isWatching = false;
 	}
 	
 	public static String getFile(){
