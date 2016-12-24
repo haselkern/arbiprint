@@ -139,7 +139,7 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.getIcons().add(new Image("resources/ic_print.png"));
 
-		primaryStage.setTitle("ARBIprint");
+		primaryStage.setTitle("ARBIprint " + Version.version);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
