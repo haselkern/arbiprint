@@ -38,7 +38,7 @@ public class Main extends Application {
 		// Setup drag And Drop pane with image
 		Image image = new Image("resources/ic_copy.png");
 		ImageView imageView = new ImageView(image);
-		dragDropLabel = new Label("Drop files here to print them", imageView);
+		dragDropLabel = new Label("Dateien hierhin ziehen", imageView);
 		dragDropLabel.setContentDisplay(ContentDisplay.TOP);
 		// Create drag and drop list
 		ListView<File> list = new ListView<File>();
@@ -76,20 +76,20 @@ public class Main extends Application {
 
 		// Textfield for username, password and printername
 		TextField username = new TextField(Prefs.getUser());
-		username.setPromptText("username");
+		username.setPromptText("ARBI Nutzername");
 		
 		PasswordField password = new PasswordField();
-		password.setPromptText("password");
+		password.setPromptText("Passwort");
 		
 		ComboBox<String> printername = new ComboBox<String>(printers);
 		printername.setPrefWidth(Double.MAX_VALUE);
 		printername.setEditable(true);
-		printername.setPromptText("printername");
+		printername.setPromptText("Druckername");
 
 		// Print button and settings button
-		printButton = new Button("print");
+		printButton = new Button("Drucken");
 		printButton.setPrefWidth(300);
-		Button settingsButton = new Button("preferences");
+		Button settingsButton = new Button("Einstellungen");
 		settingsButton.setPrefWidth(100);
 		
 		HBox buttons = new HBox(printButton, settingsButton);

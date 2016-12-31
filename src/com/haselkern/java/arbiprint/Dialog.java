@@ -6,33 +6,22 @@ import javafx.scene.control.Alert.AlertType;
 public class Dialog {
 
 	public static void missingCredentials(){
-		showError("Missing credentials", "Please enter username, password and printername.");
+		showError("Unvollständige Anmeldedaten", "Gib bitte Nutzername, Passwort und den Druckernamen ein.");
 	}
 	
 	public static void loginFailed(){
-		showError("Login failed", "Wrong password or username.");
+		showError("Anmeldung fehlgeschlagen", "Überprüfe bitte deinen Benutzernamen und das Passwort.");
 	}
 	
 	public static void hostUnreachable(){
-		showError("Host unreachable", "Check your internet connection or enter a different host in settings.");
+		showError("Host nicht erreichbar", "Überpfüfe bitte deine Internetverbindung und die Einstellungen.");
 	}
 	
 	private static void showError(String title, String msg){
 		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle("Error");
+		alert.setTitle("Fehler");
 		alert.setHeaderText(title);
 		alert.setContentText(msg);
-
-		alert.showAndWait();
-	}
-	
-	public static void desktopMissing(){
-		
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Preferences");
-		alert.setHeaderText("Couldn't open file");
-	
-		alert.setContentText("Preferences can be edited manually in the file:\n" + Prefs.getFile());
 
 		alert.showAndWait();
 	}

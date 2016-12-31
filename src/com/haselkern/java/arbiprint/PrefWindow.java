@@ -19,7 +19,7 @@ public class PrefWindow extends Stage {
 		getIcons().add(new Image("resources/ic_print.png"));
 		
 		// Components
-		Label l1 = new Label("Print command:");
+		Label l1 = new Label("Druckbefehl:");
 		TextField printCommandField = new TextField(Prefs.getPrintCommand());
 		printCommandField.setPrefWidth(500);
 		
@@ -27,13 +27,13 @@ public class PrefWindow extends Stage {
 		TextField hostField = new TextField(Prefs.getHost());
 
 		// Cancel button
-		Button buttonCancel = new Button("Cancel");
+		Button buttonCancel = new Button("Abbrechen");
 		buttonCancel.setOnAction(event -> {
 			close();
 		});
 		
 		// Save button
-		Button buttonSave = new Button("Save");
+		Button buttonSave = new Button("Speichern");
 		buttonSave.setOnAction(event -> {
 			Prefs.setPrintCommand(printCommandField.getText());
 			Prefs.setHost(hostField.getText());
@@ -41,7 +41,7 @@ public class PrefWindow extends Stage {
 		});
 		
 		// Revert button
-		Button buttonRevert = new Button("Restore defaults");
+		Button buttonRevert = new Button("Zurücksetzen");
 		buttonRevert.setOnAction(event -> {
 			Prefs.revert();
 			close();
@@ -60,7 +60,7 @@ public class PrefWindow extends Stage {
 		// Set scene and title
 		Scene scene = new Scene(content);
 		setScene(scene);
-		setTitle("Preferences");
+		setTitle("Einstellungen");
 		
 	}
 	

@@ -1,5 +1,8 @@
 .settings/
+.idea/
 bin/
 lib/
+src/META-INF
 .classPath
 .project
+*.iml
