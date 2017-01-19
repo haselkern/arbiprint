@@ -14,7 +14,7 @@ public class Dialog {
 	}
 	
 	public static void hostUnreachable(){
-		showError("Host nicht erreichbar", "Überpfüfe bitte deine Internetverbindung und die Einstellungen.");
+		showError("Host nicht erreichbar", "Überprüfe bitte deine Internetverbindung und die Einstellungen.");
 	}
 	
 	private static void showError(String title, String msg){
