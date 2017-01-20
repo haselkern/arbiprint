@@ -127,11 +127,11 @@ public class Prefs {
 	}
 	
 	public static String getFile(){
-		return getFolder() + "arbiprint-config.txt";
+		return getFolder() + "config.txt";
 	}
 	
-	private static String getFolder(){
-		return System.getProperty("user.home") + "/.haselkern/";
+	public static String getFolder(){
+		return System.getProperty("user.home") + "/.haselkern/arbiprint/";
 	}
 	
 	// Read properties from file

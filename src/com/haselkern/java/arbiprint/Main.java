@@ -1,19 +1,13 @@
 package com.haselkern.java.arbiprint;
 
-import java.io.File;
-
+import com.haselkern.java.arbiprint.updater.Updater;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
@@ -25,6 +19,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 public class Main extends Application {
 
 	private ObservableList<File> files;
@@ -34,7 +35,6 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		
 		// Setup drag And Drop pane with image
 		Image image = new Image("resources/ic_copy.png");
 		ImageView imageView = new ImageView(image);
@@ -91,9 +91,6 @@ public class Main extends Application {
 		printButton.setPrefWidth(300);
 		Button settingsButton = new Button("Einstellungen");
 		settingsButton.setPrefWidth(100);
-		
-		HBox buttons = new HBox(printButton, settingsButton);
-		buttons.setSpacing(5);
 
 		// Open preference window
 		settingsButton.setOnAction(event -> {
@@ -130,8 +127,27 @@ public class Main extends Application {
 			
 		});
 
+		HBox buttons = new HBox(printButton, settingsButton);
+		buttons.setSpacing(5);
+
+		// Hyperlink to install updates
+		Hyperlink updateLink = new Hyperlink("Update verfügbar");
+		updateLink.setManaged(false);
+		updateLink.setOnAction(event -> {
+			runUpdater();
+		});
+
+		// Show hyperlink, if an update could be found
+		new Thread(() -> {
+			if(Version.updateAvailable()){
+				Platform.runLater(() -> {
+					updateLink.setManaged(true);
+				});
+			}
+		}).start();
+
 		// Create layout
-		VBox box = new VBox(dragDropPane, username, password, printername, buttons);
+		VBox box = new VBox(updateLink, dragDropPane, username, password, printername, buttons);
 		box.setPadding(new Insets(5, 5, 5, 5));
 		box.setSpacing(5);
 
@@ -154,6 +170,49 @@ public class Main extends Application {
 		if(files.isEmpty()){
 			dragDropLabel.setVisible(true);
 		}
+	}
+
+	/**
+	 * Downloads and launches the updater and passes the path to the current jar as an argument
+	 */
+	private void runUpdater(){
+
+		try {
+
+			// Is updating available?
+			if(!Updater.canAutoUpdate()){
+				Dialog.updaterFailed();
+				return;
+			}
+
+			// Download updater
+			System.out.println("Downloading updater...");
+			String updaterJar = Prefs.getFolder()+"updater.jar";
+
+			URL updaterURL = new URL(Updater.url);
+			InputStream in = updaterURL.openStream();
+			Files.copy(in, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
+
+			// Get path to jar
+			File jar = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
+
+			// For Debugging purposes, if the path is not a jar, modify it, so that updating works
+			if(!jar.isFile()){
+				jar = new File(jar, "arbiprint.jar");
+			}
+
+			// Run updater
+			ProcessBuilder pb = new ProcessBuilder("java", "-jar", updaterJar, "--path="+jar.getAbsolutePath());
+			pb.start();
+
+			// Exit
+			Platform.exit();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Dialog.updaterFailed();
+		}
+
 	}
 	
 	public static void main(String[] args) {

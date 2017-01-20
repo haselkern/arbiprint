@@ -16,7 +16,11 @@ public class Dialog {
 	public static void hostUnreachable(){
 		showError("Host nicht erreichbar", "Überprüfe bitte deine Internetverbindung und die Einstellungen.");
 	}
-	
+
+	public static void updaterFailed(){
+		showError("Update fehlgeschlagen", "Der Updateprozess konnte nicht gestartet werden. Lade die neueste Version manuell herunter:\n\nhaselkern.com/arbiprint");
+	}
+
 	private static void showError(String title, String msg){
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Fehler");
@@ -25,5 +29,5 @@ public class Dialog {
 
 		alert.showAndWait();
 	}
-	
+
 }

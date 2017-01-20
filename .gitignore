@@ -2,7 +2,7 @@
 .idea/
 bin/
 lib/
-src/META-INF
+*.MF
 .classPath
 .project
 *.iml
