@@ -50,3 +50,21 @@ h2{
 .pane span{
     display: block;
 }
+
+#changelog{
+    max-width: 400px;
+    margin: 0 auto;
+    margin-bottom: 5em;
+}
+#changelog p{
+    padding: 1em;
+}
+#changelog h2{
+    margin-bottom: 0;
+}
+#changelog h2:before{
+    content: "<";
+}
+#changelog h2:after{
+    content: ">";
+}
