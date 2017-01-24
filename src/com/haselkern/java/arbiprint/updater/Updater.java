@@ -42,28 +42,8 @@ public class Updater extends Application {
 			return;
 		}
 
-		// Create progressbar
-		ProgressBar pb = new ProgressBar();
-		pb.setPrefWidth(400);
-		pb.setPrefHeight(50);
-
-		// Create label
-		Label l = new Label("aktualisiere...");
-
-		// Stack label on progressbar
-		StackPane pane = new StackPane(pb, l);
-
-		// Set scene
-		Scene scene = new Scene(pane);
-		primaryStage.setScene(scene);
-
-		// Set icon
-		primaryStage.getIcons().add(new Image("resources/ic_print.png"));
-
-		// Setup stage
-		primaryStage.setTitle("ARBIprint " + Version.getString());
-		primaryStage.setResizable(false);
-		primaryStage.show();
+		// Show window
+		getLoadingStage().show();
 
 		// Download and run new version
 		new Thread(() -> {
@@ -92,6 +72,34 @@ public class Updater extends Application {
 
 		}).start();
 
+	}
+
+	public static Stage getLoadingStage(){
+
+		// Create progressbar
+		ProgressBar pb = new ProgressBar();
+		pb.setPrefWidth(400);
+		pb.setPrefHeight(50);
+
+		// Create label
+		Label l = new Label("aktualisiere...");
+
+		// Stack label on progressbar
+		StackPane pane = new StackPane(pb, l);
+
+		// Set scene
+		Scene scene = new Scene(pane);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+
+		// Set icon
+		stage.getIcons().add(new Image("resources/ic_print.png"));
+
+		// Setup stage
+		stage.setTitle("ARBIprint " + Version.getString());
+		stage.setResizable(false);
+
+		return stage;
 	}
 
 	/**

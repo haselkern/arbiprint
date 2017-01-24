@@ -134,7 +134,17 @@ public class Main extends Application {
 		Hyperlink updateLink = new Hyperlink("Update verfügbar");
 		updateLink.setManaged(false);
 		updateLink.setOnAction(event -> {
-			runUpdater();
+			// Hide primaryStage
+			primaryStage.hide();
+
+			// Show loading window
+			Updater.getLoadingStage().show();
+
+			// Download updater
+			new Thread(() -> {
+				runUpdater();
+			}).start();
+
 		});
 
 		// Show hyperlink, if an update could be found
