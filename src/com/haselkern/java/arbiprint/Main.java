@@ -86,6 +86,19 @@ public class Main extends Application {
 		printername.setEditable(true);
 		printername.setPromptText("Druckername");
 
+		// Jump to the next field
+		username.setOnAction((event) -> {
+			password.requestFocus();
+		});
+		password.setOnAction((event) -> {
+			printername.requestFocus();
+		});
+		// Click the print button when enter is pressed in the printername field
+		printername.setOnAction((event) -> {
+			printButton.fire();
+		});
+
+
 		// Print button and settings button
 		printButton = new Button("Drucken");
 		printButton.setPrefWidth(300);
@@ -104,7 +117,7 @@ public class Main extends Application {
 		
 		printButton.setOnAction(event -> {
 			// Check if all data has been entered
-			if(username.getText().length() == 0 || password.getText().length() == 0 || printername.getValue() == null){
+			if(username.getText().length() == 0 || password.getText().length() == 0 || printername.getValue() == null || printername.getValue().length() == 0){
 				Dialog.missingCredentials();
 			}
 			else{
