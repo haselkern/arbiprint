@@ -66,7 +66,7 @@ public class Printer implements Runnable {
 					Thread.sleep(1000);
 				} catch(Exception e){}
 				
-				String filePath = "arbiprint/" + f.getName();
+				String filePath = "arbiprint/" + f.getName().replace(" ", "_");
 				
 				// Upload
 				sftpChannel.put(f.getAbsolutePath(), filePath);
