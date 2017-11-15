@@ -81,7 +81,7 @@ public class Main extends Application {
 		PasswordField password = new PasswordField();
 		password.setPromptText("Passwort");
 		
-		ComboBox<String> printername = new ComboBox<String>(printers);
+		ComboBox<String> printername = new ComboBox<>(printers);
 		printername.setPrefWidth(Double.MAX_VALUE);
 		printername.setEditable(true);
 		printername.setPromptText("Druckername");
@@ -93,11 +93,6 @@ public class Main extends Application {
 		password.setOnAction((event) -> {
 			printername.requestFocus();
 		});
-		// Click the print button when enter is pressed in the printername field
-		printername.setOnAction((event) -> {
-			printButton.fire();
-		});
-
 
 		// Print button and settings button
 		printButton = new Button("Drucken");
@@ -154,9 +149,7 @@ public class Main extends Application {
 			Updater.getLoadingStage().show();
 
 			// Download updater
-			new Thread(() -> {
-				runUpdater();
-			}).start();
+			new Thread(this::runUpdater).start();
 
 		});
 
