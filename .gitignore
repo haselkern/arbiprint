@@ -1,8 +1,10 @@
 .settings/
 .idea/
 bin/
-lib/
 *.MF
 .classPath
 .project
 *.iml
+.gradle
+build/
+out/

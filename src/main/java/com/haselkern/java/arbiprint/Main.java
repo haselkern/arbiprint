@@ -36,7 +36,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		// Setup drag And Drop pane with image
-		Image image = new Image("resources/ic_copy.png");
+		Image image = new Image("/ic_copy.png");
 		ImageView imageView = new ImageView(image);
 		dragDropLabel = new Label("Dateien hierhin ziehen", imageView);
 		dragDropLabel.setContentDisplay(ContentDisplay.TOP);
@@ -169,7 +169,7 @@ public class Main extends Application {
 
 		Scene scene = new Scene(box, 400, 400);
 		primaryStage.setScene(scene);
-		primaryStage.getIcons().add(new Image("resources/ic_print.png"));
+		primaryStage.getIcons().add(new Image("/ic_print.png"));
 
 		primaryStage.setTitle("ARBIprint " + Version.getString());
 		primaryStage.setResizable(false);

@@ -16,7 +16,7 @@ public class PrefWindow extends Stage {
 	public PrefWindow(){
 		
 		// Set icon
-		getIcons().add(new Image("resources/ic_print.png"));
+		getIcons().add(new Image("/ic_print.png"));
 		
 		// Components
 		Label l1 = new Label("Druckbefehl:");
