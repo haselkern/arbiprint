@@ -1,5 +1,8 @@
 package com.haselkern.java.arbiprint;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,14 +10,10 @@ import java.net.URL;
 
 public class Version {
 
-	// Check for updates on this URL
-	// TODO use releases API
-	public static final String versionURL = "https://raw.githubusercontent.com/haselkern/arbiprint/master/src/resources/VERSION.txt";
-
 	/**
 	 * Read version from file
 	 */
-	public static String getString(){
+	public static String getVersionString(){
 
 		try{
 
@@ -41,13 +40,16 @@ public class Version {
 		try {
 
 			// Load online version
-			URL checkme = new URL(versionURL);
+			URL checkme = new URL(Path.RELEASE_INFO_JSON);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(checkme.openStream()));
-			String onlineVersion = reader.readLine();
+
+			JsonObject releaseInfo = new JsonParser().parse(reader).getAsJsonObject();
+			String onlineVersion = releaseInfo.get("tag_name").getAsString();
+
 			reader.close();
 
 			// Compare versions
-			return isNewerVersion(getString(), onlineVersion);
+			return isNewerVersion(getVersionString(), onlineVersion);
 
 		} catch (Exception e) {
 			e.printStackTrace();

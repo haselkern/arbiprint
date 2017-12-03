@@ -1,6 +1,5 @@
 package com.haselkern.java.arbiprint;
 
-import com.haselkern.java.arbiprint.updater.Updater;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -8,6 +7,9 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
@@ -19,9 +21,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -31,9 +36,26 @@ public class Main extends Application {
 	private ObservableList<File> files;
 	private Button printButton;
 	private Label dragDropLabel;
-	
+	private Stage primaryStage;
+
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		this.primaryStage = primaryStage;
+
+		// Check if we are currently in update mode
+		// Get parameter
+		final String arbiprintJar = getParameters().getNamed().get("path");
+
+		// If we are in update mode
+		if(arbiprintJar != null){
+			// Copy jar to new location
+			Files.copy(Paths.get(Path.getTemporaryJarPath()), Paths.get(arbiprintJar), StandardCopyOption.REPLACE_EXISTING);
+
+			// Run new jar
+			ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", arbiprintJar);
+			processBuilder.start();
+			return;
+		}
 
 		// Setup drag And Drop pane with image
 		Image image = new Image("/ic_copy.png");
@@ -41,7 +63,7 @@ public class Main extends Application {
 		dragDropLabel = new Label("Dateien hierhin ziehen", imageView);
 		dragDropLabel.setContentDisplay(ContentDisplay.TOP);
 		// Create drag and drop list
-		ListView<File> list = new ListView<File>();
+		ListView<File> list = new ListView<>();
 		files = FXCollections.observableArrayList();
 		list.setItems(files);
 		
@@ -142,11 +164,6 @@ public class Main extends Application {
 		Hyperlink updateLink = new Hyperlink("Update verfügbar");
 		updateLink.setManaged(false);
 		updateLink.setOnAction(event -> {
-			// Hide primaryStage
-			primaryStage.hide();
-
-			// Show loading window
-			Updater.getLoadingStage().show();
 
 			// Download updater
 			new Thread(this::runUpdater).start();
@@ -171,7 +188,7 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.getIcons().add(new Image("/ic_print.png"));
 
-		primaryStage.setTitle("ARBIprint " + Version.getString());
+		primaryStage.setTitle("ARBIprint " + Version.getVersionString());
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
@@ -195,21 +212,34 @@ public class Main extends Application {
 
 		try {
 
-			// Is updating available?
+			// If autoupdate doesn't work, the user has to manually download
 			if(!Updater.canAutoUpdate()){
-				Dialog.updaterFailed();
+				if (Desktop.isDesktopSupported()) {
+					Desktop.getDesktop().browse(new URI(Path.RELEASE_WEBSITE));
+				}
+				// If we cannot open the website, the user has to open it manually
+				else{
+					Dialog.updaterFailed();
+				}
 				return;
 			}
 
+			Platform.runLater(() -> {
+				// Hide primaryStage
+				primaryStage.hide();
+				// Show loading window
+				Updater.getLoadingStage().show();
+			});
+
 			// Download updater
 			System.out.println("Downloading updater...");
-			String updaterJar = Prefs.getFolder()+"updater.jar";
+			String updaterJar = Path.getTemporaryJarPath();
 
-			URL updaterURL = new URL(Updater.url);
+			URL updaterURL = new URL(Path.getNewestJarURL());
 			InputStream in = updaterURL.openStream();
 			Files.copy(in, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
 
-			// Get path to jar
+			// Get path to currently running jar
 			File jar = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
 
 			// For Debugging purposes, if the path is not a jar, modify it, so that updating works
