@@ -54,7 +54,7 @@ public class Main extends Application {
 			// Run new jar
 			ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", arbiprintJar);
 			processBuilder.start();
-			return;
+			System.exit(0);
 		}
 
 		// Setup drag And Drop pane with image
@@ -256,7 +256,9 @@ public class Main extends Application {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			Dialog.updaterFailed();
+			Platform.runLater(() -> {
+				Dialog.updaterFailed();
+			});
 		}
 
 	}
