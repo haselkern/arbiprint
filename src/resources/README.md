@@ -1,0 +1,1 @@
+The file ```VERSION.txt``` in this directory is neccessary, so that ARBIprint versions below 1.4 detect the update to the GitHub releases system.
