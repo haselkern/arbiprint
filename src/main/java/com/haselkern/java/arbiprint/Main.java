@@ -252,13 +252,11 @@ public class Main extends Application {
 			pb.start();
 
 			// Exit
-			Platform.exit();
+			System.exit(0);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			Platform.runLater(() -> {
-				Dialog.updaterFailed();
-			});
+			Platform.runLater(Dialog::updaterFailed);
 		}
 
 	}
