@@ -1,17 +1,27 @@
 package com.haselkern.java.arbiprint;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainController implements IGUICallback {
 
@@ -27,13 +37,19 @@ public class MainController implements IGUICallback {
     private StackPane dragDropPane;
     @FXML
     private Label dragDropLabel;
+    @FXML
+    private CheckBox savePassword;
+    @FXML
+    private Hyperlink updateLink;
+    @FXML
+    private ListView<File> fileList;
 
-    private List<File> files;
+    private ObservableList<File> files;
     private Stage primaryStage;
 
     public MainController(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        files = new ArrayList<>();
+        files = FXCollections.observableArrayList();
     }
 
     @FXML
@@ -52,10 +68,43 @@ public class MainController implements IGUICallback {
 				}
 			}
 		});
-
 		dragDropPane.setOnDragOver(event -> {
 			event.acceptTransferModes(TransferMode.COPY);
 		});
+
+		// Setup file list
+        fileList.setItems(files);
+        // Show filename without path in list
+        fileList.setCellFactory(listView -> {
+            ListCell<File> cell = new ListCell<File>(){
+                @Override
+                protected void updateItem(File item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if(!empty){
+                        setText(item.getName());
+                    }
+                }
+            };
+            return cell;
+        });
+
+        // Remove list entries with [DEL]
+		fileList.setOnKeyReleased(event -> {
+			if(event.getCode() == KeyCode.DELETE){
+                for (File file : fileList.getSelectionModel().getSelectedItems()) {
+                    removeFileFromList(file);
+                }
+			}
+		});
+
+		// Set username and Password
+        username.setText(Prefs.getUser());
+        password.setText(Prefs.getPassword());
+        // If password is saved, keep the checkbox to save it checked
+        savePassword.setSelected(password.getText().length() > 0);
+
+        // Hide updateLink
+        updateLink.setManaged(false);
 
     }
 
@@ -83,6 +132,14 @@ public class MainController implements IGUICallback {
 
             // Save new prefs
             Prefs.setUser(username.getText());
+            // Save password, if check is set
+            if(savePassword.isSelected()) {
+                Prefs.setPassword(password.getText());
+            }
+            // Reset password, if it shouldn't be saved
+            else{
+                Prefs.setPassword("");
+            }
         }
     }
 
@@ -99,6 +156,24 @@ public class MainController implements IGUICallback {
         prefWindow.show();
     }
 
+    @FXML
+    public void update(){
+
+        new Thread(() -> Updater.update(primaryStage)).start();
+
+    }
+
+    @FXML
+    public void website(){
+
+        try {
+            Desktop.getDesktop().browse(new URI(Path.MAIN_WEBSITE));
+        } catch (IOException | URISyntaxException e) {
+            Dialog.cannotOpenWebsite();
+        }
+
+    }
+
     @Override
     public void setPrintButtonEnabled(boolean enabled) {
         Platform.runLater(() -> {
@@ -108,6 +183,16 @@ public class MainController implements IGUICallback {
 
     @Override
     public void removeFileFromList(File f) {
-        // TODO
+        files.remove(f);
+        if(files.isEmpty()){
+            dragDropLabel.setVisible(true);
+        }
+    }
+
+    @Override
+    public void updateAvailable() {
+        Platform.runLater(() -> {
+            updateLink.setManaged(true);
+        });
     }
 }

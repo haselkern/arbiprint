@@ -46,18 +46,6 @@ public class Main extends Application {
 			System.exit(0);
 		}
 
-//		// Setup drag And Drop pane with image
-//		Image image = new Image("/ic_copy.png");
-//		ImageView imageView = new ImageView(image);
-//		dragDropLabel = new Label("Dateien hierhin ziehen", imageView);
-//		dragDropLabel.setContentDisplay(ContentDisplay.TOP);
-//		// Create drag and drop list
-//		ListView<File> list = new ListView<>();
-//		files = FXCollections.observableArrayList();
-//		list.setItems(files);
-//
-//		StackPane dragDropPane = new StackPane(list, dragDropLabel);
-//
 //		// Remove list entries with [DEL]
 //		list.setOnKeyReleased(event -> {
 //			if(event.getCode() == KeyCode.DELETE){
@@ -175,7 +163,8 @@ public class Main extends Application {
 
 
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main.fxml"));
-		fxmlLoader.setController(new MainController(primaryStage));
+		MainController controller = new MainController(primaryStage);
+		fxmlLoader.setController(controller);
 		Parent layout = fxmlLoader.load();
 
 		Scene scene = new Scene(layout);
@@ -186,75 +175,15 @@ public class Main extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.show();
 
-	}
-
-	public void setEnablePrintButton(boolean enabled){
-		printButton.setDisable(!enabled);
-	}
-	
-	public void removeFileFromList(File f){
-		files.remove(f);
-		if(files.isEmpty()){
-			dragDropLabel.setVisible(true);
-		}
-	}
-
-	/**
-	 * Downloads and launches the updater and passes the path to the current jar as an argument
-	 */
-	private void runUpdater(){
-
-		try {
-
-			// If autoupdate doesn't work, the user has to manually download
-			if(!Updater.canAutoUpdate()){
-				if (Desktop.isDesktopSupported()) {
-					Desktop.getDesktop().browse(new URI(Path.RELEASE_WEBSITE));
-				}
-				// If we cannot open the website, the user has to open it manually
-				else{
-					Dialog.updaterFailed();
-				}
-				return;
+		// Check for updates
+		new Thread(() -> {
+			if(Version.updateAvailable()) {
+				controller.updateAvailable();
 			}
-
-			Platform.runLater(() -> {
-				// Hide primaryStage
-				primaryStage.hide();
-				// Show loading window
-				Updater.getLoadingStage().show();
-			});
-
-			// Download updater
-			System.out.println("Downloading updater...");
-			String updaterJar = Path.getTemporaryJarPath();
-
-			URL updaterURL = new URL(Path.getNewestJarURL());
-			InputStream in = updaterURL.openStream();
-			Files.copy(in, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
-
-			// Get path to currently running jar
-			File jar = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
-
-			// For Debugging purposes, if the path is not a jar, modify it, so that updating works
-			if(!jar.isFile()){
-				jar = new File(jar, "arbiprint.jar");
-			}
-
-			// Run updater
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", updaterJar, "--path="+jar.getAbsolutePath());
-			pb.start();
-
-			// Exit
-			System.exit(0);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			Platform.runLater(Dialog::updaterFailed);
-		}
+		}).start();
 
 	}
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}

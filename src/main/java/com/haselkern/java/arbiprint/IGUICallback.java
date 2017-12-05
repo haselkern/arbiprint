@@ -7,4 +7,6 @@ public interface IGUICallback {
     void setPrintButtonEnabled(boolean enabled);
 
     void removeFileFromList(File f);
+
+    void updateAvailable();
 }

@@ -1,21 +1,13 @@
 package com.haselkern.java.arbiprint;
 
+import com.jcraft.jsch.*;
+import javafx.application.Platform;
+
 import java.io.File;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
-
-import javafx.application.Platform;
-import javafx.util.Pair;
 
 public class Printer implements Runnable {
 
@@ -106,12 +98,12 @@ public class Printer implements Runnable {
 
 			// If e has a cause (UnkownHostException)
 			if(e.getCause() != null && e.getCause().getClass() == UnknownHostException.class){
-				Platform.runLater(() -> Dialog.hostUnreachable());
+				Dialog.hostUnreachable();
 			}
 			else{				
 				Platform.runLater(() -> Dialog.loginFailed());
 			}
-			
+
 		} catch (SftpException e) {
 			e.printStackTrace();
 		}
