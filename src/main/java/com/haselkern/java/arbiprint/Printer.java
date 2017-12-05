@@ -2,7 +2,10 @@ package com.haselkern.java.arbiprint;
 
 import java.io.File;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
@@ -12,22 +15,38 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 import javafx.application.Platform;
+import javafx.util.Pair;
 
 public class Printer implements Runnable {
 
+//	public static List<Pair<String, String>> PRINTERS = Arrays.asList(
+//	);
+
+	public static Map<String, String> getPrinters(){
+
+		Map<String, String> printers = new HashMap<>();
+		printers.put("Blau", "lwblau");
+		printers.put("Grün", "lwgruen");
+		printers.put("Orange", "lworange");
+		printers.put("Rot", "lwrot");
+		printers.put("Violett", "lwviolett");
+		return printers;
+
+	}
+
 	private File[] files;
-	private Main callback;
+	private IGUICallback callback;
 	private String username, password;
 	private String printername;
 	
-	public Printer(List<File> filelist, String username, String password, String printername, Main callback){
+	public Printer(List<File> filelist, String username, String password, String printername, IGUICallback callback){
 		files = new File[filelist.size()];
 		files = filelist.toArray(files);
 		
-		this.callback = callback;
 		this.username = username;
 		this.password = password;
 		this.printername = printername;
+		this.callback = callback;
 	}
 	
 	@Override
@@ -36,11 +55,8 @@ public class Printer implements Runnable {
 		System.out.println("Printing " + files.length + " files as user " + username + " on printer " + printername);
 		System.out.println("Host: " + Prefs.getHost());
 		System.out.println("Command: " + Prefs.getPrintCommand());
+		callback.setPrintButtonEnabled(false);
 		
-		Platform.runLater(() -> {
-			callback.setEnablePrintButton(false);
-		});
-
 		try {
 
 			JSch jsch = new JSch();
@@ -100,9 +116,7 @@ public class Printer implements Runnable {
 			e.printStackTrace();
 		}
 		
-		Platform.runLater(() -> {
-			callback.setEnablePrintButton(true);
-		});
+		callback.setPrintButtonEnabled(true);
 
 	}
 	

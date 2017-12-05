@@ -2,6 +2,9 @@ package com.haselkern.java.arbiprint;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 public class Dialog {
 
@@ -26,6 +29,9 @@ public class Dialog {
 		alert.setTitle("Fehler");
 		alert.setHeaderText(title);
 		alert.setContentText(msg);
+
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage.getIcons().add(new Image("/ic_print.png"));
 
 		alert.showAndWait();
 	}

@@ -71,23 +71,6 @@ public class Prefs {
 		props.setProperty(KEY_HOST, host);
 		writeProps();
 	}
-	
-	public static void addPrinter(String printername){
-		List<String> p = getPrinters();
-		
-		// Printer is already in the list, abort
-		if(printername == null || p.contains(printername) || printername.length() == 0) return;
-		
-		p.add(printername);
-		
-		p.sort((a, b) -> a.compareTo(b));
-		
-		String s = String.join(",", p);
-		
-		props.setProperty(KEY_PRINTER, s.toString());
-		writeProps();
-	}
-	
 
 	// Restore default settings
 	public static void revert(){
