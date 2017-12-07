@@ -3,11 +3,13 @@ package com.haselkern.java.arbiprint;
 import com.jcraft.jsch.JSchException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -65,10 +67,7 @@ public class MainController implements IMainCallback {
         dragDropPane.setOnDragDropped(event -> {
 			Dragboard board = event.getDragboard();
 			if (board.hasFiles()) {
-				for (File f : board.getFiles()) {
-					files.add(f);
-					dragDropLabel.setVisible(false);
-				}
+                files.addAll(board.getFiles());
 			}
 		});
 		dragDropPane.setOnDragOver(event -> {
@@ -77,17 +76,36 @@ public class MainController implements IMainCallback {
 
 		// Setup file list
         fileList.setItems(files);
-        // Show filename without path in list
+        // Hide/Show hint to drop files, if there are files
+        files.addListener((ListChangeListener<? super File>) c -> {
+            dragDropLabel.setVisible(files.isEmpty());
+        });
+        // Setup cellFactory
         fileList.setCellFactory(listView -> {
-            ListCell<File> cell = new ListCell<File>(){
-                @Override
-                protected void updateItem(File item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if(!empty){
-                        setText(item.getName());
-                    }
+            ListCell<File> cell = new ListCell<>();
+
+            // Setup contextmenu
+            MenuItem deleteItem = new MenuItem("Entfernen");
+            deleteItem.setOnAction(event -> {
+                removeFileFromList(cell.getItem());
+            });
+            MenuItem deleteAllItem = new MenuItem("Alle löschen");
+            deleteAllItem.setOnAction(event -> {
+                files.clear();
+            });
+            ContextMenu contextMenu = new ContextMenu(deleteItem, deleteAllItem);
+
+            // Setup listener to set text and contextmenu
+            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+                if (isNowEmpty) {
+                    cell.setContextMenu(null);
+                    cell.setText("");
+                } else {
+                    cell.setContextMenu(contextMenu);
+                    cell.setText(cell.getItem().getName());
                 }
-            };
+            });
+
             return cell;
         });
 
@@ -187,9 +205,6 @@ public class MainController implements IMainCallback {
     @Override
     public void removeFileFromList(File f) {
         files.remove(f);
-        if(files.isEmpty()){
-            dragDropLabel.setVisible(true);
-        }
     }
 
     @Override
