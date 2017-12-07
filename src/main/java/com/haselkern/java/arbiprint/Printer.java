@@ -5,6 +5,7 @@ import javafx.application.Platform;
 
 import java.io.File;
 import java.net.UnknownHostException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,15 +74,17 @@ public class Printer implements Runnable {
 				try{
 					Thread.sleep(1000);
 				} catch(Exception e){}
-				
-				String filePath = "arbiprint/" + f.getName().replace(" ", "_");
+
+				String filePath = "arbiprint/" + Base64.getEncoder().encodeToString(f.getName().getBytes());
 				
 				// Upload
 				sftpChannel.put(f.getAbsolutePath(), filePath);
 				
 				// Run print command
 				ChannelExec execChannel = (ChannelExec) session.openChannel("exec");
-				execChannel.setCommand(Prefs.getPrintCommand().replaceAll("%FILE%", filePath).replaceAll("%PRINTER%", printername));
+				String printCommand = Prefs.getPrintCommand().replaceAll("%FILE%", filePath).replaceAll("%PRINTER%", printername);
+				System.out.println("running: " + printCommand);
+				execChannel.setCommand(printCommand);
 				execChannel.connect();
 				execChannel.disconnect();
 				
@@ -101,7 +104,7 @@ public class Printer implements Runnable {
 				Dialog.hostUnreachable();
 			}
 			else{				
-				Platform.runLater(() -> Dialog.loginFailed());
+				Dialog.loginFailed();
 			}
 
 		} catch (SftpException e) {

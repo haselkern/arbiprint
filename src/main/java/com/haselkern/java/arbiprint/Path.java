@@ -14,7 +14,7 @@ public class Path {
     public static final String RELEASE_INFO_JSON = "https://api.github.com/repos/haselkern/arbiprint/releases/latest";
     public static final String MAIN_WEBSITE = "http://haselkern.com/arbiprint";
 
-    public static final String getNewestJarURL() throws IOException {
+    public static String getNewestJarURL() throws IOException {
 
         URL url = new URL(Path.RELEASE_INFO_JSON);
         BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -27,7 +27,7 @@ public class Path {
         return jarURL;
     }
 
-    public static final String getTemporaryJarPath() {
+    public static String getTemporaryJarPath() {
         return Prefs.getFolder() + "arbiprint.jar";
     }
 
