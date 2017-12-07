@@ -1,9 +1,9 @@
-package com.haselkern.java.arbiprint;
+package com.haselkern.java.arbiprint.test;
 
-import org.junit.Test;
+import com.haselkern.java.arbiprint.Version;
 
 public class VersionTest {
-    @Test
+
     public void isNewerVersion() throws Exception {
         assert Version.isNewerVersion("v1.0", "v1.1");
         assert Version.isNewerVersion("1.0", "v1.1");
