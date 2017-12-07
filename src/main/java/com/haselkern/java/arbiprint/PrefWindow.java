@@ -30,6 +30,7 @@ public class PrefWindow extends Stage {
 		// Set scene and title
 		Scene scene = new Scene(content);
 		setScene(scene);
+		setResizable(false);
 		setTitle("Einstellungen");
 		
 	}
