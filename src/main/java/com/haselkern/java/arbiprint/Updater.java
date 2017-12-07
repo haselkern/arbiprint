@@ -21,121 +21,141 @@ import java.nio.file.StandardCopyOption;
 
 /**
  * Provides methods for handling the update process.
- *
+ * <p>
  * When the update process is started, the following happens:
- *  - download the newet JAR to a temporary location (say: temp.jar)
- *  - Get the path to the current jar (say: current.jar)
- *  - Launch _java -jar temp.jar --path current.jar_
- *  - exit
+ * - download the newet JAR to a temporary location (say: temp.jar)
+ * - Get the path to the current jar (say: current.jar)
+ * - Launch _java -jar temp.jar --path current.jar_
+ * - exit
  * The temp.jar can now override current.jar, as it's no longer in use.
  * After that, temp.jar will launch (the now updated) current.jar.
  */
 public class Updater {
 
-	/**
-	 * @return A stage, that shows an indefinite loading bar.
-	 */
-	public static Stage getLoadingStage(){
+    /**
+     * @return A stage, that shows an indefinite loading bar.
+     */
+    public static Stage getLoadingStage() {
 
-		// Create progressbar
-		ProgressBar pb = new ProgressBar();
-		pb.setPrefWidth(400);
-		pb.setPrefHeight(50);
+        // Create progressbar
+        ProgressBar pb = new ProgressBar();
+        pb.setPrefWidth(400);
+        pb.setPrefHeight(50);
 
-		// Create label
-		Label l = new Label("aktualisiere...");
+        // Create label
+        Label l = new Label("aktualisiere...");
 
-		// Stack label on progressbar
-		StackPane pane = new StackPane(pb, l);
+        // Stack label on progressbar
+        StackPane pane = new StackPane(pb, l);
 
-		// Set scene
-		Scene scene = new Scene(pane);
-		Stage stage = new Stage();
-		stage.setScene(scene);
+        // Set scene
+        Scene scene = new Scene(pane);
+        Stage stage = new Stage();
+        stage.setScene(scene);
 
-		// Set icon
-		stage.getIcons().add(new Image("/ic_print.png"));
+        // Set icon
+        stage.getIcons().add(new Image("/ic_print.png"));
 
-		// Setup stage
-		stage.setTitle("ARBIprint " + Version.getVersionString());
-		stage.setResizable(false);
+        // Setup stage
+        stage.setTitle("ARBIprint " + Version.getVersionString());
+        stage.setResizable(false);
 
-		return stage;
-	}
+        return stage;
+    }
 
-	/**
-	 * Can we run the update process?
-	 * @return true, if java is installed in system path, and we can update automatically
-	 */
-	public static boolean canAutoUpdate(){
-		try {
+    /**
+     * Can we run the update process?
+     * @return true, if we can somehow access java, so that we can autoUpdate
+     */
+    public static boolean canAutoUpdate() {
+        return javaExe() != null;
+    }
 
-			// If this doesn't throw an exception, then we can start jar files
-			ProcessBuilder pb = new ProcessBuilder("java", "-version");
-			Process p = pb.start();
-			p.destroy();
+    /**
+     * Returns the path to java, or tries to run "java".
+     * https://stackoverflow.com/a/46852384/1456971
+     * @return The full path to the java executable, or just "java" if java is in the system path.
+     */
+    private static String javaExe() {
+        final String JAVA_HOME = System.getProperty("java.home");
+        final File BIN = new File(JAVA_HOME, "bin");
+        File exe = new File(BIN, "java");
 
-			return true;
+        if (!exe.exists()) {
+            // We might be on Windows, which needs an exe extension
+            exe = new File(BIN, "java.exe");
+        }
 
-		} catch (IOException e) {
-			// This exception occurs, when 'java' is not in PATH
-			return false;
-		}
-	}
+        if (exe.exists()) {
+            return exe.getAbsolutePath();
+        }
 
-	/**
-	 * Launches the update process
-	 * @param primaryStage The primaryStage, that can be hidden.
-	 */
-	public static void update(Stage primaryStage){
+        try {
+            // Just try invoking java from the system path; this of course
+            // assumes "java[.exe]" is /actually/ Java
+            final String NAKED_JAVA = "java";
+            new ProcessBuilder(NAKED_JAVA).start();
 
-		try {
-			// If autoupdate doesn't work, the user has to manually download
-			if(!Updater.canAutoUpdate()){
-				if (Desktop.isDesktopSupported()) {
-					Desktop.getDesktop().browse(new URI(Path.RELEASE_WEBSITE));
-				}
-				// If we cannot open the website, the user has to open it manually
-				else{
-					Dialog.updaterFailed();
-				}
-				return;
-			}
+            return NAKED_JAVA;
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
-			Platform.runLater(() -> {
-				// Hide primaryStage
-				primaryStage.hide();
-				// Show loading window
-				getLoadingStage().show();
-			});
+    /**
+     * Launches the update process
+     *
+     * @param primaryStage The primaryStage, that can be hidden.
+     */
+    public static void update(Stage primaryStage) {
 
-			// Download updater
-			System.out.println("Downloading updater...");
-			String updaterJar = Path.getTemporaryJarPath();
+        try {
+            // If autoupdate doesn't work, the user has to manually download
+            if (!Updater.canAutoUpdate()) {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().browse(new URI(Path.RELEASE_WEBSITE));
+                }
+                // If we cannot open the website, the user has to open it manually
+                else {
+                    Dialog.updaterFailed();
+                }
+                return;
+            }
 
-			URL updaterURL = new URL(Path.getNewestJarURL());
-			InputStream in = updaterURL.openStream();
-			Files.copy(in, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
+            Platform.runLater(() -> {
+                // Hide primaryStage
+                primaryStage.hide();
+                // Show loading window
+                getLoadingStage().show();
+            });
 
-			// Get path to currently running jar
-			File jar = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
+            // Download updater
+            System.out.println("Downloading updater...");
+            String updaterJar = Path.getTemporaryJarPath();
 
-			// For Debugging purposes, if the path is not a jar, modify it, so that updating works
-			if(!jar.isFile()){
-				jar = new File(jar, "arbiprint.jar");
-			}
+            URL updaterURL = new URL(Path.getNewestJarURL());
+            InputStream in = updaterURL.openStream();
+            Files.copy(in, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
 
-			// Run updater
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", updaterJar, "--path="+jar.getAbsolutePath());
-			pb.start();
+            // Get path to currently running jar
+            File jar = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
 
-			// Exit
-			System.exit(0);
+            // For Debugging purposes, if the path is not a jar, modify it, so that updating works
+            if (!jar.isFile()) {
+                jar = new File(jar, "arbiprint.jar");
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Dialog.updaterFailed();
-		}
+            // Run updater
+            ProcessBuilder pb = new ProcessBuilder("java", "-jar", updaterJar, "--path=" + jar.getAbsolutePath());
+            pb.start();
 
-	}
+            // Exit
+            System.exit(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Dialog.updaterFailed();
+        }
+
+    }
 }
