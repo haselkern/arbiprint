@@ -20,10 +20,21 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * Created by Lars on 19.01.2017.
+ * Provides methods for handling the update process.
+ *
+ * When the update process is started, the following happens:
+ *  - download the newet JAR to a temporary location (say: temp.jar)
+ *  - Get the path to the current jar (say: current.jar)
+ *  - Launch _java -jar temp.jar --path current.jar_
+ *  - exit
+ * The temp.jar can now override current.jar, as it's no longer in use.
+ * After that, temp.jar will launch (the now updated) current.jar.
  */
 public class Updater {
 
+	/**
+	 * @return A stage, that shows an indefinite loading bar.
+	 */
 	public static Stage getLoadingStage(){
 
 		// Create progressbar
@@ -54,6 +65,7 @@ public class Updater {
 
 	/**
 	 * Can we run the update process?
+	 * @return true, if java is installed in system path, and we can update automatically
 	 */
 	public static boolean canAutoUpdate(){
 		try {
@@ -71,6 +83,10 @@ public class Updater {
 		}
 	}
 
+	/**
+	 * Launches the update process
+	 * @param primaryStage The primaryStage, that can be hidden.
+	 */
 	public static void update(Stage primaryStage){
 
 		try {

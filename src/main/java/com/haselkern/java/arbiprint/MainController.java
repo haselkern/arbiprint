@@ -23,6 +23,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
+/**
+ * The MainController handles all the interactions in the main window.
+ */
 public class MainController implements IMainCallback {
 
     @FXML

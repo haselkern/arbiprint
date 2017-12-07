@@ -6,6 +6,9 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+/**
+ * Convenience methods for showing dialogs on the UI thread.
+ */
 public class Dialog {
 
 	public static void missingCredentials(){
@@ -32,10 +35,16 @@ public class Dialog {
 		showDialog(AlertType.WARNING, "Reset fehlgeschlagen", "Das zurücksetzen der Daten auf dem Server ist fehlgeschlagen. Überprüfe deine Anmeldedaten und die Einstellung für den Host.");
 	}
 
+	/**
+	 * Shows a dialog on the JavaFX thread
+	 * @param alertType The icon to be displayed
+	 * @param title The title of the dialog
+	 * @param msg The message in the dialog.
+	 */
 	private static void showDialog(AlertType alertType, String title, String msg){
 		Platform.runLater(() -> {
 			Alert alert = new Alert(alertType);
-			alert.setTitle("Fehler");
+			alert.setTitle(title);
 			alert.setHeaderText(title);
 			alert.setContentText(msg);
 

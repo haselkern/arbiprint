@@ -5,11 +5,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
+/**
+ * Provides a simple interface for handling the saved settings.
+ */
 public class Prefs {
 	
 	private static final String KEY_PRINT_CMD = "command";
@@ -73,7 +73,9 @@ public class Prefs {
 		writeProps();
 	}
 
-	// Restore default settings
+	/**
+	 * Resets all the different fields to their default values
+	 */
 	public static void revert(){
 		check();
 		props.setProperty(KEY_HOST, DEFAULT_HOST);
@@ -83,8 +85,10 @@ public class Prefs {
 		props.setProperty(KEY_PASS, DEFAULT_PASSWORD);
 		writeProps();
 	}
-	
-	// Check if properties are loaded and complete
+
+	/**
+	 * Check if a property file exists, and prefill all fields.
+	 */
 	private static void check(){
 		
 		// Read props if they don't exist in memory
@@ -99,6 +103,9 @@ public class Prefs {
 		if(!props.containsKey(KEY_USER)){
 			props.put(KEY_USER, DEFAULT_USER);
 		}
+		if(!props.containsKey(KEY_PASS)){
+			props.put(KEY_PASS, DEFAULT_PASSWORD);
+		}
 		if(!props.containsKey(KEY_PRINTER)){
 			props.put(KEY_PRINTER, DEFAULT_PRINTER);
 		}
@@ -109,22 +116,17 @@ public class Prefs {
 		writeProps();
 		
 	}
-	
-	public static String getFile(){
-		return getFolder() + "config.txt";
-	}
-	
-	public static String getFolder(){
-		return System.getProperty("user.home") + "/.haselkern/arbiprint/";
-	}
-	
-	// Read properties from file
+
+	/**
+	 * Load the properties file from disk.
+	 * @return The loaded properties.
+	 */
 	private static Properties readProps(){
 		Properties props = new Properties();
 		
 		try {
 			
-			BufferedReader reader = Files.newBufferedReader(new File(getFile()).toPath());
+			BufferedReader reader = Files.newBufferedReader(new File(Path.getPropertyPath()).toPath());
 			String line;
 			while((line = reader.readLine()) != null){
 				
@@ -144,14 +146,16 @@ public class Prefs {
 		
 		return props;
 	}
-	
-	// Write properties to file
+
+	/**
+	 * Write the property file to disk.
+	 */
 	private static void writeProps(){
 
 		try {
 			
 			// Create directories
-			File folder = new File(getFolder());
+			File folder = new File(Path.getFolder());
 			folder.mkdirs();
 
 			// Write file
@@ -164,7 +168,7 @@ public class Prefs {
 				out.append("\n");
 			}
 			
-			FileOutputStream fos = new FileOutputStream(new File(getFile()), false);
+			FileOutputStream fos = new FileOutputStream(new File(Path.getPropertyPath()), false);
 			fos.write(out.toString().getBytes());
 			fos.close();
 			

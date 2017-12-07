@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+/**
+ * The controller for handling interactions in the {@link PrefWindow}
+ */
 public class PrefWindowController {
 
     @FXML

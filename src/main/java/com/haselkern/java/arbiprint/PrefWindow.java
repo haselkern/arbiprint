@@ -8,6 +8,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * The main Window for changing settings.
+ */
 public class PrefWindow extends Stage {
 
 	public PrefWindow(IMainCallback callback) {

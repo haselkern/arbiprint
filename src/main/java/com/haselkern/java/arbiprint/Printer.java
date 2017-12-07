@@ -10,11 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The {@link Printer} handles connecting to the server and printing.
+ */
 public class Printer implements Runnable {
 
-//	public static List<Pair<String, String>> PRINTERS = Arrays.asList(
-//	);
-
+	/**
+	 * @return A list of all available printers in the ARBI. Pairs are [display name, real name]
+	 */
 	public static Map<String, String> getPrinters(){
 
 		Map<String, String> printers = new HashMap<>();
@@ -31,17 +34,30 @@ public class Printer implements Runnable {
 	private IMainCallback callback;
 	private String username, password;
 	private String printername;
-	
+
+	/**
+	 * Creates a new Printer object.
+	 * @param filelist The list of files to be printed. May be null, if you do not want to call {@link Printer#run}
+	 * @param username The username
+	 * @param password The password of the user
+	 * @param printername The name of the priner to print on. May be null, if you do not want to call {@link Printer#run}
+	 * @param callback A callback for handling interactions with the GUI
+	 */
 	public Printer(List<File> filelist, String username, String password, String printername, IMainCallback callback){
-		files = new File[filelist.size()];
-		files = filelist.toArray(files);
-		
+		if (filelist != null){
+			files = new File[filelist.size()];
+			files = filelist.toArray(files);
+		}
+
 		this.username = username;
 		this.password = password;
 		this.printername = printername;
 		this.callback = callback;
 	}
-	
+
+	/**
+	 * Starts the printing process.
+	 */
 	@Override
 	public void run() {
 		
@@ -115,6 +131,10 @@ public class Printer implements Runnable {
 
 	}
 
+	/**
+	 * Clears all the temporary files from the server.
+	 * @throws JSchException If connecting or logging in went wrong.
+	 */
 	public void clearServerFiles() throws JSchException {
 
 		JSch jsch = new JSch();
