@@ -10,13 +10,13 @@ import java.io.IOException;
 
 public class PrefWindow extends Stage {
 
-	public PrefWindow() {
+	public PrefWindow(IMainCallback callback) {
 		
 		// Set icon
 		getIcons().add(new Image("/ic_print.png"));
 		
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/prefs.fxml"));
-		loader.setController(new PrefWindowController(this));
+		loader.setController(new PrefWindowController(this, callback));
 		Parent content = null;
 		try {
 			content = loader.load();

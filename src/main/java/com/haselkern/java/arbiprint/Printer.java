@@ -28,11 +28,11 @@ public class Printer implements Runnable {
 	}
 
 	private File[] files;
-	private IGUICallback callback;
+	private IMainCallback callback;
 	private String username, password;
 	private String printername;
 	
-	public Printer(List<File> filelist, String username, String password, String printername, IGUICallback callback){
+	public Printer(List<File> filelist, String username, String password, String printername, IMainCallback callback){
 		files = new File[filelist.size()];
 		files = filelist.toArray(files);
 		
@@ -112,6 +112,24 @@ public class Printer implements Runnable {
 		}
 		
 		callback.setPrintButtonEnabled(true);
+
+	}
+
+	public void clearServerFiles() throws JSchException {
+
+		JSch jsch = new JSch();
+		Session session = jsch.getSession(username, Prefs.getHost(), 22);
+		session.setPassword(password);
+		session.setConfig("StrictHostKeyChecking", "no");
+		session.connect();
+
+		ChannelExec execChannel = null;
+		execChannel = (ChannelExec) session.openChannel("exec");
+		execChannel.setCommand("rm arbiprint/*");
+		execChannel.connect();
+		execChannel.disconnect();
+
+		session.disconnect();
 
 	}
 	

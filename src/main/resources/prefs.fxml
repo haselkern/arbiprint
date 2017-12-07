@@ -9,15 +9,18 @@
 
 <VBox prefWidth="500.0" spacing="5.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
+      <Label text="Setze lokal gespeicherte Informationen (Nutzername, Passwort, Host und Druckbefehl) wieder auf die Standardeinstellungen zurück:" wrapText="true" />
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#resetLocal" text="Lokale Daten zurücksetzen" />
+      <Label text="Lösche die auf dem Server gespeicherten Druck- und Logdateien:" wrapText="true" />
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#resetServer" text="Daten vom Server löschen" />
       <Label text="Druckbefehl:" />
       <TextField fx:id="printerCommand" />
       <Label text="Host:" />
       <TextField fx:id="printerHost" />
       <HBox alignment="CENTER" spacing="5.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#save" text="Speichern" />
-            <Button mnemonicParsing="false" onAction="#reset" text="Zurücksetzen" />
-            <Button mnemonicParsing="false" onAction="#cancel" text="Abbrechen" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#save" text="Speichern" HBox.hgrow="ALWAYS" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cancel" text="Abbrechen" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </children>

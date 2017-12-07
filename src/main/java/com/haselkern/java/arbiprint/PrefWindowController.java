@@ -12,9 +12,11 @@ public class PrefWindowController {
     private TextField printerHost;
 
     private Stage primaryStage;
+    private IMainCallback callback;
 
-    public PrefWindowController(Stage primaryStage) {
+    public PrefWindowController(Stage primaryStage, IMainCallback callback) {
         this.primaryStage = primaryStage;
+        this.callback = callback;
     }
 
     @FXML
@@ -31,8 +33,15 @@ public class PrefWindowController {
     }
 
     @FXML
-    public void reset(){
+    public void resetLocal(){
         Prefs.revert();
+        callback.clearFields();
+        primaryStage.close();
+    }
+
+    @FXML
+    public void resetServer(){
+        callback.resetServer();
         primaryStage.close();
     }
 

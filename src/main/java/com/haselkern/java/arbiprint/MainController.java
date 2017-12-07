@@ -1,5 +1,6 @@
 package com.haselkern.java.arbiprint;
 
+import com.jcraft.jsch.JSchException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,10 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
-public class MainController implements IGUICallback {
+public class MainController implements IMainCallback {
 
     @FXML
     private TextField username;
@@ -150,7 +150,7 @@ public class MainController implements IGUICallback {
 
     @FXML
     public void settings(){
-        PrefWindow prefWindow = new PrefWindow();
+        PrefWindow prefWindow = new PrefWindow(this);
         prefWindow.initOwner(primaryStage);
         prefWindow.initModality(Modality.WINDOW_MODAL);
         prefWindow.show();
@@ -194,5 +194,24 @@ public class MainController implements IGUICallback {
         Platform.runLater(() -> {
             updateLink.setManaged(true);
         });
+    }
+
+    @Override
+    public void clearFields() {
+        username.clear();
+        password.clear();
+        savePassword.setSelected(false);
+        printername.getSelectionModel().clearSelection();
+    }
+
+    @Override
+    public void resetServer() {
+        Printer printer = new Printer(Arrays.asList(), username.getText(), password.getText(), null, this);
+        try {
+            printer.clearServerFiles();
+        } catch (JSchException e) {
+            e.printStackTrace();
+            Dialog.serverResetFailed();
+        }
     }
 }

@@ -28,6 +28,10 @@ public class Dialog {
 		showDialog(AlertType.INFORMATION, "Website", "ARBIprint findest du im Internet auf:\n\n" + Path.MAIN_WEBSITE);
 	}
 
+	public static void serverResetFailed() {
+		showDialog(AlertType.WARNING, "Reset fehlgeschlagen", "Das zurücksetzen der Daten auf dem Server ist fehlgeschlagen. Überprüfe deine Anmeldedaten und die Einstellung für den Host.");
+	}
+
 	private static void showDialog(AlertType alertType, String title, String msg){
 		Platform.runLater(() -> {
 			Alert alert = new Alert(alertType);

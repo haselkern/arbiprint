@@ -80,7 +80,7 @@ public class Prefs {
 		props.setProperty(KEY_PRINTER, DEFAULT_PRINTER);
 		props.setProperty(KEY_PRINT_CMD, DEFAULT_PRINT_CMD);
 		props.setProperty(KEY_USER, DEFAULT_USER);
-		props.setProperty(KEY_USER, DEFAULT_PASSWORD);
+		props.setProperty(KEY_PASS, DEFAULT_PASSWORD);
 		writeProps();
 	}
 	
