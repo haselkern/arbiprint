@@ -88,8 +88,11 @@ public class Printer implements Runnable {
 			for(File f : files){
 				
 				try{
+					// Sleep for a short while, so that the printer can keep up
 					Thread.sleep(1000);
-				} catch(Exception e){}
+				} catch(Exception e){
+					// Exception is irrelevant
+				}
 
 				String filePath = "arbiprint/" + Base64.getEncoder().encodeToString(f.getName().getBytes());
 				

@@ -11,6 +11,9 @@ import javafx.stage.Stage;
  */
 public class Dialog {
 
+	// Prevent instancing
+	private Dialog(){}
+
 	public static void missingCredentials(){
 		showDialog(AlertType.ERROR,"Unvollständige Anmeldedaten", "Gib bitte Nutzername, Passwort und den Druckernamen ein.");
 	}

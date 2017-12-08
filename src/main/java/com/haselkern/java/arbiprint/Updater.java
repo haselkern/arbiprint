@@ -1,6 +1,5 @@
 package com.haselkern.java.arbiprint;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -31,6 +30,9 @@ import java.nio.file.StandardCopyOption;
  * After that, temp.jar will launch (the now updated) current.jar.
  */
 public class Updater {
+
+    // Prevent instancing
+    private Updater(){}
 
     /**
      * @return A stage, that shows an indefinite loading bar.
@@ -77,22 +79,22 @@ public class Updater {
      * @return The full path to the java executable, or just "java" if java is in the system path.
      */
     private static String javaExe() {
-        final String JAVA_HOME = System.getProperty("java.home");
-        final File BIN = new File(JAVA_HOME, "bin");
-        File exe = new File(BIN, "java");
+        final String javaHome = System.getProperty("java.home");
+        final File javaBin = new File(javaHome, "bin");
+        File javaExe = new File(javaBin, "java");
 
-        if (!exe.exists()) {
-            // We might be on Windows, which needs an exe extension
-            exe = new File(BIN, "java.exe");
+        if (!javaExe.exists()) {
+            // We might be on Windows, which needs an javaExe extension
+            javaExe = new File(javaBin, "java.javaExe");
         }
 
-        if (exe.exists()) {
-            return exe.getAbsolutePath();
+        if (javaExe.exists()) {
+            return javaExe.getAbsolutePath();
         }
 
         try {
             // Just try invoking java from the system path; this of course
-            // assumes "java[.exe]" is /actually/ Java
+            // assumes "java[.javaExe]" is /actually/ Java
             final String NAKED_JAVA = "java";
             new ProcessBuilder(NAKED_JAVA).start();
 
@@ -109,6 +111,7 @@ public class Updater {
      */
     public static void update(Stage primaryStage) {
 
+        InputStream updaterJarInputStream = null;
         try {
             // If autoupdate doesn't work, the user has to manually download
             if (!Updater.canAutoUpdate()) {
@@ -134,8 +137,8 @@ public class Updater {
             String updaterJar = Path.getTemporaryJarPath();
 
             URL updaterURL = new URL(Path.getNewestJarURL());
-            InputStream in = updaterURL.openStream();
-            Files.copy(in, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
+            updaterJarInputStream = updaterURL.openStream();
+            Files.copy(updaterJarInputStream, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
 
             // Get path to currently running jar
             File jar = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
@@ -155,6 +158,15 @@ public class Updater {
         } catch (Exception e) {
             e.printStackTrace();
             Dialog.updaterFailed();
+        }
+        finally {
+            if(updaterJarInputStream != null){
+                try {
+                    updaterJarInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
     }

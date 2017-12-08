@@ -123,10 +123,11 @@ public class Prefs {
 	 */
 	private static Properties readProps(){
 		Properties props = new Properties();
-		
+
+		BufferedReader reader = null;
 		try {
-			
-			BufferedReader reader = Files.newBufferedReader(new File(Path.getPropertyPath()).toPath());
+
+			reader = Files.newBufferedReader(new File(Path.getPropertyPath()).toPath());
 			String line;
 			while((line = reader.readLine()) != null){
 				
@@ -143,6 +144,15 @@ public class Prefs {
 		} catch(Exception e){
 			e.printStackTrace();
 		}
+		finally {
+			if(reader != null){
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 		return props;
 	}
@@ -152,8 +162,9 @@ public class Prefs {
 	 */
 	private static void writeProps(){
 
+		FileOutputStream prefFileOutputStream = null;
 		try {
-			
+
 			// Create directories
 			File folder = new File(Path.getFolder());
 			folder.mkdirs();
@@ -167,13 +178,22 @@ public class Prefs {
 				out.append(props.getProperty(k));
 				out.append("\n");
 			}
-			
-			FileOutputStream fos = new FileOutputStream(new File(Path.getPropertyPath()), false);
-			fos.write(out.toString().getBytes());
-			fos.close();
+
+			prefFileOutputStream = new FileOutputStream(new File(Path.getPropertyPath()), false);
+			prefFileOutputStream.write(out.toString().getBytes());
+			prefFileOutputStream.close();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally {
+			if (prefFileOutputStream != null) {
+				try {
+					prefFileOutputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	

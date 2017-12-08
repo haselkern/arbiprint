@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -12,6 +13,9 @@ import java.net.URL;
  * Holds information about versions and version comparisions.
  */
 public class Version {
+
+	// Prevent instancing
+	private Version(){}
 
 	/**
 	 * Read the current version from file
@@ -40,11 +44,12 @@ public class Version {
 	 */
 	public static boolean updateAvailable(){
 
+		BufferedReader reader = null;
 		try {
 
 			// Load online version
 			URL checkme = new URL(Path.RELEASE_INFO_JSON);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(checkme.openStream()));
+			reader = new BufferedReader(new InputStreamReader(checkme.openStream()));
 
 			JsonObject releaseInfo = new JsonParser().parse(reader).getAsJsonObject();
 			String onlineVersion = releaseInfo.get("tag_name").getAsString();
@@ -57,6 +62,15 @@ public class Version {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}
+		finally {
+			if(reader != null){
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 	}
@@ -87,8 +101,8 @@ public class Version {
 				return true;
 
 			if (i < oldV.length && i < newV.length){
-				int o = Integer.valueOf(oldV[i]);
-				int n = Integer.valueOf(newV[i]);
+				int o = Integer.parseInt(oldV[i]);
+				int n = Integer.parseInt(newV[i]);
 				if (n > o)
 					return true;
 				else if(n < o)

@@ -13,6 +13,9 @@ import java.net.URL;
  */
 public class Path {
 
+    // Prevent instancing
+    private Path(){}
+
     public static final String RELEASE_WEBSITE = "https://github.com/haselkern/arbiprint/releases/latest";
     public static final String RELEASE_INFO_JSON = "https://api.github.com/repos/haselkern/arbiprint/releases/latest";
     public static final String MAIN_WEBSITE = "http://haselkern.com/arbiprint";
