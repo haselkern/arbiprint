@@ -9,9 +9,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -34,21 +32,24 @@ public class Updater {
     // Prevent instancing
     private Updater(){}
 
+    private static ProgressBar progressBar;
+
     /**
-     * @return A stage, that shows an indefinite loading bar.
+     * @return A stage, that shows a loading bar.
      */
     public static Stage getLoadingStage() {
 
         // Create progressbar
-        ProgressBar pb = new ProgressBar();
-        pb.setPrefWidth(400);
-        pb.setPrefHeight(50);
+        progressBar = new ProgressBar();
+        progressBar.setProgress(0);
+        progressBar.setPrefWidth(400);
+        progressBar.setPrefHeight(50);
 
         // Create label
         Label l = new Label("aktualisiere...");
 
         // Stack label on progressbar
-        StackPane pane = new StackPane(pb, l);
+        StackPane pane = new StackPane(progressBar, l);
 
         // Set scene
         Scene scene = new Scene(pane);
@@ -112,6 +113,7 @@ public class Updater {
     public static void update(Stage primaryStage) {
 
         InputStream updaterJarInputStream = null;
+        OutputStream tempJarOutputStream = null;
         try {
             // If autoupdate doesn't work, the user has to manually download
             if (!Updater.canAutoUpdate()) {
@@ -138,7 +140,24 @@ public class Updater {
 
             URL updaterURL = new URL(Path.getNewestJarURL());
             updaterJarInputStream = updaterURL.openStream();
-            Files.copy(updaterJarInputStream, Paths.get(updaterJar), StandardCopyOption.REPLACE_EXISTING);
+
+            // Copy file and update progressbar
+            tempJarOutputStream = new FileOutputStream(Paths.get(updaterJar).toFile());
+            byte[] buf = new byte[1024];
+            int len;
+            double maximumSize = Version.getJarFileSize();
+            int processedSize = 0;
+            while( (len = updaterJarInputStream.read(buf)) > 0){
+                // Copy bytes
+                tempJarOutputStream.write(buf, 0, len);
+
+                // Update progressbar
+                processedSize += len;
+                final double progress = processedSize / maximumSize;
+                Platform.runLater(() -> {
+                    progressBar.setProgress(progress);
+                });
+            }
 
             // Get path to currently running jar
             File jar = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toFile();
@@ -160,9 +179,17 @@ public class Updater {
             Dialog.updaterFailed();
         }
         finally {
+            // Close streams
             if(updaterJarInputStream != null){
                 try {
                     updaterJarInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(tempJarOutputStream != null){
+                try {
+                    tempJarOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

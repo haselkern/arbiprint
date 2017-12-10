@@ -14,6 +14,9 @@ import java.net.URL;
  */
 public class Version {
 
+	private static String onlineVersion = null;
+	private static int jarFileSize = 0;
+
 	// Prevent instancing
 	private Version(){}
 
@@ -52,7 +55,8 @@ public class Version {
 			reader = new BufferedReader(new InputStreamReader(checkme.openStream()));
 
 			JsonObject releaseInfo = new JsonParser().parse(reader).getAsJsonObject();
-			String onlineVersion = releaseInfo.get("tag_name").getAsString();
+			onlineVersion = releaseInfo.get("tag_name").getAsString();
+			jarFileSize = releaseInfo.get("assets").getAsJsonArray().get(0).getAsJsonObject().get("size").getAsInt();
 
 			reader.close();
 
@@ -73,6 +77,10 @@ public class Version {
 			}
 		}
 
+	}
+
+	public static int getJarFileSize() {
+		return jarFileSize;
 	}
 
 	/***
