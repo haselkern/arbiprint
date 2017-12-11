@@ -22,7 +22,7 @@ public class Printer implements Runnable {
 
 		Map<String, String> printers = new HashMap<>();
 		printers.put("Blau", "lwblau");
-		printers.put("Grün", "lwgruen");
+		printers.put("Gr\u00fcn", "lwgruen");
 		printers.put("Orange", "lworange");
 		printers.put("Rot", "lwrot");
 		printers.put("Violett", "lwviolett");
